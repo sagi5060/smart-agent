@@ -1043,17 +1043,6 @@ typing-extensions = {version = ">=4.10.0", markers = "python_version < \"3.13\""
 full = ["httpx (>=0.27.0,<0.29.0)", "itsdangerous", "jinja2", "python-multipart (>=0.0.18)", "pyyaml"]
 
 [[package]]
-name = "systemd-python"
-version = "235"
-description = "Python interface for libsystemd"
-optional = false
-python-versions = "*"
-groups = ["main"]
-files = [
-    {file = "systemd-python-235.tar.gz", hash = "sha256:4e57f39797fd5d9e2d22b8806a252d7c0106c936039d1e71c8c6b8008e695c0a"},
-]
-
-[[package]]
 name = "tomli"
 version = "2.2.1"
 description = "A lil' TOML parser"
@@ -1176,4 +1165,4 @@ standard = ["colorama (>=0.4) ; sys_platform == \"win32\"", "httptools (>=0.6.3)
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10"
-content-hash = "9c06cb2f276c6fc8ee7e22212d816797b036db99eb44264e8525e6ff871e3477"
+content-hash = "6a396043b5cfeab7c611c867293dcead6ad38dd76da3ef3856988cac895fd5b8"
