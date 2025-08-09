@@ -57,7 +57,7 @@ jobs:
 
       - name: Run tests
         shell: bash
-        run: bash scripts/run_tests.sh tools-cov
+        run: bash ./run_tests.sh tools-cov
 
       - name: Upload coverage report (optional)
         if: always() && hashFiles('coverage.xml') != ''
