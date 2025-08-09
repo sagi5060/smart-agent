@@ -1,7 +1,8 @@
+import logging
 from importlib.metadata import entry_points
-from .logger import setup_logger
 
-logger = setup_logger(__name__)
+logger = logging.getLogger(__name__)
+
 
 def load_tools():
     eps = entry_points()
@@ -10,8 +11,13 @@ def load_tools():
     for ep in selected_eps:
         tool_class = ep.load()
         tool_instances.append(tool_class())
+
+    # Log loaded tools
+    for tool in tool_instances:
+        logger.info(f"Loaded tool: {tool.get_name()}")
+
     return tool_instances
 
+
+# Load tools when module is imported
 all_tools = load_tools()
-for tool in all_tools:
-    logger.info(f"Loaded tool: {tool.get_name()}")

@@ -3,13 +3,15 @@ Markdown Tool for reading and summarizing markdown files.
 """
 
 import asyncio
-from typing import Dict, Any
+import logging
+from typing import Any
+
 from .base_tool import BaseTool, ToolResult
-from ..logger import setup_logger
 
-logger = setup_logger(__name__)   
+logger = logging.getLogger(__name__)
 
-class MarkdownTool(BaseTool):    
+
+class MarkdownTool(BaseTool):
     async def run(self, file_path: str) -> ToolResult:
         """
         Run the Markdown tool with the given file path and return a ToolResult.
@@ -24,42 +26,44 @@ class MarkdownTool(BaseTool):
         loop = asyncio.get_running_loop()
         try:
             content = await loop.run_in_executor(None, self._read_markdown, file_path)
-            logger.info(f"Successfully read Markdown file: {file_path} ({len(content)} characters)")
+            logger.info(
+                f"Successfully read Markdown file: {file_path} ({len(content)} characters)"
+            )
         except FileNotFoundError:
             logger.warning(f"Markdown file not found: {file_path}")
             return ToolResult(data="", meta={"error": f"File '{file_path}' not found."})
         except Exception as e:
             logger.error(f"Error reading Markdown file {file_path}: {str(e)}")
             return ToolResult(data="", meta={"error": str(e)})
-        
+
         # Simple summary logic (could be replaced with a more complex algorithm)
         lines = content.splitlines()
         summary = lines[0] if lines else "No content"
-        
+
         # Extract headers (lines starting with #)
-        headers = [line for line in lines if line.startswith('#')]
-        
+        headers = [line for line in lines if line.startswith("#")]
+
         meta = {
             "file_path": file_path,
             "length": len(content),
             "summary": summary,
             "lines_count": len(lines),
             "headers": headers,
-            "word_count": len(content.split())
+            "word_count": len(content.split()),
         }
         return ToolResult(data=content, meta=meta)
-    
+
     def _read_markdown(self, file_path: str) -> str:
         """
         Read markdown file content.
-        
+
         Args:
             file_path (str): Path to the markdown file.
-            
+
         Returns:
             str: Content of the markdown file.
         """
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             return f.read()
 
     def get_name(self) -> str:
@@ -71,7 +75,7 @@ class MarkdownTool(BaseTool):
         """
         return "Markdown Tool"
 
-    def to_ollama_tool(self) -> Dict[str, Any]:
+    def to_ollama_tool(self) -> dict[str, Any]:
         return {
             "type": "function",
             "function": {
@@ -80,9 +84,12 @@ class MarkdownTool(BaseTool):
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        "file_path": {"type": "string", "description": "Path to the markdown file to read"}
+                        "file_path": {
+                            "type": "string",
+                            "description": "Path to the markdown file to read",
+                        }
                     },
-                    "required": ["file_path"]
-                }
-            }
+                    "required": ["file_path"],
+                },
+            },
         }

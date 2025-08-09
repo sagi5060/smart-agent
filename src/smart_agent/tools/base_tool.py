@@ -2,10 +2,12 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any
 
+
 @dataclass
 class ToolResult:
     data: str
     meta: dict[str, Any]
+
 
 class BaseTool(ABC):
     """
@@ -16,7 +18,7 @@ class BaseTool(ABC):
     async def run(self, *args, **kwargs) -> ToolResult:
         """
         Execute the tool with the given arguments and return a ToolResult.
-        
+
         Args:
             *args: Positional arguments for the tool.
             **kwargs: Keyword arguments for the tool.
