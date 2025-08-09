@@ -122,6 +122,17 @@ See `TESTING.md` for detailed testing documentation.
 
 ```
 smart_agent/
+├── docs/                     # UML diagrams and documentation
+│   ├── README.md            # UML documentation guide
+│   ├── class_diagram.puml   # Class structure diagram
+│   ├── sequence_diagram.puml # Interaction flow diagram
+│   ├── component_diagram.puml # System components diagram
+│   ├── activity_diagram.puml # Workflow diagram
+│   ├── architecture_diagram.puml # System architecture
+│   └── deployment_diagram.puml # Deployment structure
+├── scripts/                  # Development scripts
+│   ├── lint.sh              # Code quality checks
+│   └── format.sh            # Auto-formatting script
 ├── src/
 │   └── smart_agent/
 │       ├── __init__.py
@@ -142,6 +153,33 @@ smart_agent/
 ├── TESTING.md              # Testing documentation
 └── README.md               # This file
 ```
+
+## 🏗️ Architecture & Design
+
+The Smart Agent follows a **plugin-based architecture** with clear separation of concerns:
+
+### System Architecture
+- **Agent Layer**: Main orchestrator (`SmartAgent`)
+- **LLM Layer**: Communication with Ollama (`LLaMA3Client`)
+- **Tool Layer**: Extensible plugin system (`BaseTool` implementations)
+- **Data Layer**: Structured results (`ToolResult`)
+
+### Design Patterns
+- **Abstract Factory**: `BaseTool` for tool creation
+- **Strategy Pattern**: Different tools for different file types
+- **Observer Pattern**: Logging system
+- **Async/Await**: Non-blocking operations
+
+### UML Documentation
+Comprehensive UML diagrams are available in the `docs/` directory:
+- **Class Diagram**: Object-oriented structure
+- **Sequence Diagram**: Runtime interaction flow
+- **Component Diagram**: System components and relationships
+- **Activity Diagram**: Workflow and decision logic
+- **Architecture Diagram**: High-level system design
+- **Deployment Diagram**: Runtime environment setup
+
+See `docs/README.md` for detailed diagram documentation and viewing instructions.
 
 ## 🔧 Development
 
@@ -182,6 +220,34 @@ class MyTool(BaseTool):
 
 ### Code Quality
 
+The project includes comprehensive code quality tools and linting:
+
+```bash
+# Run all linting checks
+./scripts/lint.sh
+
+# Auto-fix linting issues
+./scripts/format.sh
+
+# Or use poetry directly
+poetry run ruff check .          # Fast Python linter
+poetry run black .               # Code formatter
+poetry run isort .               # Import sorter
+poetry run mypy src/smart_agent  # Type checker
+```
+
+#### Linting Tools
+- **Ruff**: Fast Python linter with comprehensive rules
+- **Black**: Uncompromising code formatter
+- **isort**: Import statement organizer
+- **mypy**: Static type checker
+
+#### Code Standards
+- **Line Length**: 88 characters (Black default)
+- **Import Organization**: First-party imports separated
+- **Type Hints**: Required for all public functions
+- **Error Handling**: Proper exception chaining with `from` clause
+
 - **Type Hints**: All code uses type annotations
 - **Async/Await**: Proper async programming patterns
 - **Error Handling**: Comprehensive error handling with logging
@@ -197,6 +263,10 @@ class MyTool(BaseTool):
 - `pytest`: Testing framework
 - `pytest-cov`: Coverage reporting
 - `pytest-asyncio`: Async test support
+- `ruff`: Fast Python linter
+- `black`: Code formatter
+- `isort`: Import organizer
+- `mypy`: Static type checker
 
 ## 🤝 Contributing
 
@@ -204,10 +274,12 @@ class MyTool(BaseTool):
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Make your changes
 4. Add tests for new functionality
-5. Ensure tests pass (`./run_tests.sh tools-cov`)
-6. Commit your changes (`git commit -m 'Add amazing feature'`)
-7. Push to the branch (`git push origin feature/amazing-feature`)
-8. Open a Pull Request
+5. Run code quality checks (`./scripts/lint.sh`)
+6. Auto-fix any formatting issues (`./scripts/format.sh`)
+7. Ensure tests pass (`./run_tests.sh tools-cov`)
+8. Commit your changes (`git commit -m 'Add amazing feature'`)
+9. Push to the branch (`git push origin feature/amazing-feature`)
+10. Open a Pull Request
 
 ## 📄 License
 
