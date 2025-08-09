@@ -1,0 +1,67 @@
+name: Pytest
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pytest-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+
+      - name: Verify pyproject & Poetry
+        run: |
+          test -f pyproject.toml || (echo "pyproject.toml not found"; exit 1)
+          poetry --version
+          poetry check
+
+      - name: Cache Poetry venv
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      - name: Install dependencies (Poetry)
+        run: poetry install --no-interaction --no-root
+
+      - name: Ensure test script exists
+        run: |
+          test -f scripts/run_tests.sh || (echo "scripts/run_tests.sh not found"; exit 1)
+          sed -n '1,40p' scripts/run_tests.sh || true
+
+      - name: Run tests
+        shell: bash
+        run: bash scripts/run_tests.sh tools-cov
+
+      - name: Upload coverage report (optional)
+        if: always() && hashFiles('coverage.xml') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-xml
+          path: coverage.xml
