@@ -52,8 +52,8 @@ jobs:
 
       - name: Ensure test script exists
         run: |
-          test -f scripts/run_tests.sh || (echo "scripts/run_tests.sh not found"; exit 1)
-          sed -n '1,40p' scripts/run_tests.sh || true
+          test -f ./run_tests.sh || (echo "./run_tests.sh not found"; exit 1)
+          sed -n '1,40p' ./run_tests.sh || true
 
       - name: Run tests
         shell: bash
