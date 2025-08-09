@@ -36,7 +36,7 @@ def build_app() -> FastAPI:
             response = await SmartAgent().run(text)
             return {"answer": response}
         except OllamaHealthError as e:
-            raise HTTPException(status_code=503, detail=str(e))
+            raise HTTPException(status_code=503, detail=str(e)) from e
 
     return api
 
@@ -55,7 +55,7 @@ def main(
     except OllamaHealthError as e:
         typer.echo(f"Ollama health check failed: {e}", err=True)
         raise typer.Exit(1) from e
-    
+
     # Logging is configured at root via CLI callback; emit a startup message
     uvicorn.run(
         "smart_agent.cli.commands.run:build_app",

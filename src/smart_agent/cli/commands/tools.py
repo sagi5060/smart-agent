@@ -9,7 +9,7 @@ app = typer.Typer(add_completion=False)
 def list_(
     verbose: bool = typer.Option(
         False, "-v", "--verbose", help="Show detailed information"
-    )
+    ),
 ):
     """List all available tools."""
     tools = [tool.to_ollama_tool() for tool in load_tools()]

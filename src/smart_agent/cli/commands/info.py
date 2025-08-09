@@ -6,14 +6,14 @@ from importlib import metadata
 
 import typer
 
-from smart_agent.registry import load_tools
 from smart_agent.ollama_health import (
-    OllamaHealthError, 
-    validate_ollama_setup, 
-    check_ollama_service, 
+    DEFAULT_MODEL,
+    OllamaHealthError,
+    check_ollama_service,
     get_available_models,
-    DEFAULT_MODEL
+    validate_ollama_setup,
 )
+from smart_agent.registry import load_tools
 
 app = typer.Typer(add_completion=False, invoke_without_command=True)
 
@@ -24,14 +24,16 @@ def health_check():
     try:
         validate_ollama_setup()
         typer.echo("Ollama health check passed", color=True)
-        typer.echo(f"Service is running", color=True)
+        typer.echo("Service is running", color=True)
         typer.echo(f"Required model '{DEFAULT_MODEL}' is available", color=True)
-        
+
         available_models = get_available_models()
         if len(available_models) > 1:
             other_models = [m for m in available_models if m != DEFAULT_MODEL]
-            typer.echo(f"ℹ Other available models: {', '.join(other_models)}", color=True)
-            
+            typer.echo(
+                f"ℹ Other available models: {', '.join(other_models)}", color=True
+            )
+
     except OllamaHealthError as e:
         typer.echo("Ollama health check failed:", err=True, color=True)
         typer.echo(str(e), err=True)
@@ -50,14 +52,20 @@ def main(format: str = typer.Option("text", "--format", help="json|text")):
     # Gather Ollama information
     ollama_service_running = check_ollama_service()
     available_models = get_available_models() if ollama_service_running else []
-    required_model_available = DEFAULT_MODEL in available_models if ollama_service_running else False
-    
-    ollama_status = "healthy" if ollama_service_running and required_model_available else "unhealthy"
+    required_model_available = (
+        DEFAULT_MODEL in available_models if ollama_service_running else False
+    )
+
+    ollama_status = (
+        "healthy"
+        if ollama_service_running and required_model_available
+        else "unhealthy"
+    )
     if not ollama_service_running:
         ollama_status = "service_not_running"
     elif not required_model_available:
         ollama_status = "model_not_available"
-    
+
     data = {
         "python": sys.version.split()[0],
         "platform": platform.platform(),
@@ -70,7 +78,7 @@ def main(format: str = typer.Option("text", "--format", help="json|text")):
             "required_model": DEFAULT_MODEL,
             "required_model_available": required_model_available,
             "available_models": available_models,
-        }
+        },
     }
     typer.echo(
         json.dumps(data, ensure_ascii=False, indent=None)

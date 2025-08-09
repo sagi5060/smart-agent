@@ -48,7 +48,7 @@ def main(
     async def _run():
         # Check Ollama health before proceeding
         await validate_ollama_setup_async()
-        
+
         agent = SmartAgent()
         resp = await agent.run(query)
         return resp.to_dict() if hasattr(resp, "to_dict") else str(resp)

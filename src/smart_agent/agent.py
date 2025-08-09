@@ -2,8 +2,8 @@ import logging
 
 from ollama import AsyncClient, Message
 
-from .tools.base_tool import BaseTool
 from .ollama_health import validate_ollama_setup_async
+from .tools.base_tool import BaseTool
 
 logger = logging.getLogger(__name__)
 
