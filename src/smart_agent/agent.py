@@ -1,6 +1,6 @@
 import logging
 
-from ollama import AsyncClient
+from ollama import AsyncClient, Message
 
 from .tools.base_tool import BaseTool
 
@@ -24,10 +24,10 @@ class LLaMA3Client:
         self.system_prompt = system_prompt
 
     async def generate(self, prompt: str) -> str:
-        messages = []
+        messages: list[Message] = []
         if self.system_prompt:
-            messages.append({"role": "system", "content": self.system_prompt})
-        messages.append({"role": "user", "content": prompt})
+            messages.append(Message(role="system", content=self.system_prompt))
+        messages.append(Message(role="user", content=prompt))
         response = await self.client.chat(
             model="llama3.1:8b",
             messages=messages,
@@ -52,11 +52,11 @@ class LLaMA3Client:
 
                         # Add tool result to conversation
                         messages.append(
-                            {
-                                "role": "tool",
-                                "content": f"Tool '{tool.get_name()}' returned: {result.data}\nMetadata: {result.meta}",
-                                "tool_name": tool.get_name(),
-                            }
+                            Message(
+                                role="tool",
+                                content=f"Tool '{tool.get_name()}' returned: {result.data}\nMetadata: {result.meta}",
+                                tool_name=tool.get_name(),
+                            )
                         )
                         break
 
@@ -64,10 +64,18 @@ class LLaMA3Client:
             final_response = await self.client.chat(
                 model="llama3.1:8b", messages=messages
             )
-            return final_response.message.content
+            return (
+                final_response.message.content
+                if final_response.message.content
+                else "No response from model."
+            )
         else:
             # No tool calls, return original response
-            return response.message.content
+            return (
+                response.message.content
+                if response.message.content
+                else "No response from model."
+            )
 
 
 class SmartAgent:

@@ -36,7 +36,7 @@ def main(
         typer.echo(
             "insert your query and press Ctrl+D to submit",
             err=False,
-            color=typer.colors.YELLOW,
+            color=True,
         )
         query = typer.get_text_stream("stdin").read()
 
