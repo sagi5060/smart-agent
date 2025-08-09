@@ -5,21 +5,22 @@ description = ""
 authors = [
     {name = "sagi5060",email = "sagi.shabtai@outlook.com"}
 ]
+
 readme = "README.md"
+
 requires-python = ">=3.10"
 dependencies = [
-    "ollama (>=0.5.3,<0.6.0)",
-    "panda (>=0.3.1,<0.4.0)",
-    "aiofiles (>=24.1.0,<25.0.0)",
-    "fastapi (>=0.116.1,<0.117.0)",
-    "pandas (>=2.3.1,<3.0.0)",
-    "typer (>=0.16.0,<0.17.0)",
-    "uvicorn (>=0.35.0,<0.36.0)"
+    "ollama>=0.5.0",
+    "aiofiles>=24.0.0",
+    "fastapi>=0.100.0",
+    "pandas>=2.0.0",
+    "typer>=0.12.0",
+    "uvicorn>=0.30.0",
+    "systemd-python>=235"
 ]
 
 [tool.poetry]
 packages = [{include = "smart_agent", from = "src"}]
-
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.4.1"

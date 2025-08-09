@@ -1,6 +1,6 @@
 import typer
 
-from smart_agent.registry import all_tools
+from smart_agent.registry import load_tools
 
 app = typer.Typer(add_completion=False)
 
@@ -12,7 +12,7 @@ def list_(
     )
 ):
     """List all available tools."""
-    tools = [tool.to_ollama_tool() for tool in all_tools]
+    tools = [tool.to_ollama_tool() for tool in load_tools()]
     if not tools:
         typer.echo("No tools found.")
         raise typer.Exit(0)
@@ -34,7 +34,7 @@ def list_(
 @app.command("describe")
 def describe(name: str):
     """Describe a specific tool in detail."""
-    tools = [tool.to_ollama_tool() for tool in all_tools]
+    tools = [tool.to_ollama_tool() for tool in load_tools()]
 
     for tool in tools:
         if tool["function"]["name"] == name:

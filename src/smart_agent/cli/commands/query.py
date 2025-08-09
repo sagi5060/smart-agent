@@ -1,5 +1,6 @@
 import asyncio
 import json
+import logging
 
 import typer
 
@@ -31,6 +32,9 @@ def main(
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
     """Run a single query through SmartAgent and print the result."""
+    log = logging.getLogger(__name__)
+    if verbose:
+        log.debug("verbose mode enabled")
     query = text
     if not query:
         typer.echo(
@@ -48,6 +52,7 @@ def main(
     try:
         result = asyncio.run(asyncio.wait_for(_run(), timeout=timeout))
         out = {"status": "success", "response": result}
+        log.info("query completed", extra={"format": format, "timeout": timeout})
         typer.echo(
             json.dumps(out, ensure_ascii=False)
             if format == "json"
@@ -55,6 +60,7 @@ def main(
         )
     except asyncio.TimeoutError:
         err = {"status": "error", "error": "timeout"}
+        log.warning("query timeout", extra={"timeout": timeout})
         typer.echo(
             json.dumps(err, ensure_ascii=False) if format == "json" else "timeout",
             err=(format != "json"),
@@ -62,6 +68,7 @@ def main(
         raise typer.Exit(1) from None
     except Exception as e:
         err = {"status": "error", "error": str(e)}
+        log.exception("query failed")
         typer.echo(
             json.dumps(err, ensure_ascii=False) if format == "json" else f"Error: {e}",
             err=True,

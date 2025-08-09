@@ -1,5 +1,3 @@
-import logging
-
 import typer
 import uvicorn
 from fastapi import FastAPI
@@ -46,17 +44,13 @@ def main(
     workers: int = typer.Option(1, "--workers"),
     log_level: str = typer.Option("info", "--log-level"),
 ):
-    # Configure logging
-    logging.basicConfig(
-        level=getattr(logging, log_level.upper(), "INFO"),
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    )
+    # Logging is configured at root via CLI callback; emit a startup message
     uvicorn.run(
         "smart_agent.cli.commands.run:build_app",
         host=host,
         port=port,
         reload=reload,
         workers=workers,
-        log_level=log_level,
+        log_level=log_level.lower(),
         factory=True,
     )
