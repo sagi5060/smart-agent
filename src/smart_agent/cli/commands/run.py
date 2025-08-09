@@ -1,8 +1,9 @@
 import typer
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 
 from smart_agent.agent import SmartAgent
+from smart_agent.ollama_health import OllamaHealthError, validate_ollama_setup
 
 app = typer.Typer(add_completion=False, invoke_without_command=True)
 
@@ -31,8 +32,11 @@ def build_app() -> FastAPI:
     async def answer(query: dict):
         # Replace with actual smart agent logic
         text = query.get("query", "")
-        response = await SmartAgent().run(text)
-        return {"answer": response}
+        try:
+            response = await SmartAgent().run(text)
+            return {"answer": response}
+        except OllamaHealthError as e:
+            raise HTTPException(status_code=503, detail=str(e))
 
     return api
 
@@ -44,6 +48,14 @@ def main(
     workers: int = typer.Option(1, "--workers"),
     log_level: str = typer.Option("info", "--log-level"),
 ):
+    # Check Ollama health before starting the server
+    try:
+        validate_ollama_setup()
+        typer.echo("Ollama health check passed")
+    except OllamaHealthError as e:
+        typer.echo(f"Ollama health check failed: {e}", err=True)
+        raise typer.Exit(1) from e
+    
     # Logging is configured at root via CLI callback; emit a startup message
     uvicorn.run(
         "smart_agent.cli.commands.run:build_app",

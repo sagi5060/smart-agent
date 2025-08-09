@@ -5,6 +5,7 @@ import logging
 import typer
 
 from smart_agent.agent import SmartAgent
+from smart_agent.ollama_health import OllamaHealthError, validate_ollama_setup_async
 
 app = typer.Typer(add_completion=False, invoke_without_command=True)
 
@@ -45,6 +46,9 @@ def main(
         query = typer.get_text_stream("stdin").read()
 
     async def _run():
+        # Check Ollama health before proceeding
+        await validate_ollama_setup_async()
+        
         agent = SmartAgent()
         resp = await agent.run(query)
         return resp.to_dict() if hasattr(resp, "to_dict") else str(resp)
@@ -66,6 +70,14 @@ def main(
             err=(format != "json"),
         )
         raise typer.Exit(1) from None
+    except OllamaHealthError as e:
+        err = {"status": "error", "error": str(e)}
+        log.error("Ollama health check failed", extra={"error": str(e)})
+        typer.echo(
+            json.dumps(err, ensure_ascii=False) if format == "json" else f"Error: {e}",
+            err=True,
+        )
+        raise typer.Exit(1) from e
     except Exception as e:
         err = {"status": "error", "error": str(e)}
         log.exception("query failed")

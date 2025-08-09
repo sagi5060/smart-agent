@@ -3,6 +3,7 @@ import logging
 from ollama import AsyncClient, Message
 
 from .tools.base_tool import BaseTool
+from .ollama_health import validate_ollama_setup_async
 
 logger = logging.getLogger(__name__)
 
@@ -101,4 +102,6 @@ class SmartAgent:
         self.llm = LLaMA3Client(load_tools(), self.system_prompt)
 
     async def run(self, user_query: str) -> str:
+        # Validate Ollama setup before processing the query
+        await validate_ollama_setup_async()
         return await self.llm.generate(user_query)
